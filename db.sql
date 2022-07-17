@@ -5,10 +5,10 @@ CREATE database
 
 use evaluacion_tecnica;
 
-DROP TABLE IF EXISTS Usuario;
+DROP TABLE IF EXISTS usuario;
 
 CREATE TABLE
-    Usuario(
+    usuario(
         id int AUTO_INCREMENT primary key,
         ci VARCHAR(350) NOT NULL,
         nombre VARCHAR(350) NOT NULL,
