@@ -11,12 +11,6 @@ $(document).on("click", ".delete", function () {
     }).then((result) => {
         if (result.isConfirmed) {
             eliminar(id)
-            Swal.fire(
-                'Borrado correctamente!',
-                'Elimiando correctamente',
-                'success'
-            );
-            table.draw();
         }
     })
 });
@@ -27,13 +21,30 @@ function eliminar(id) {
         dataType: "json",
         success: function (data) {
             var html = "";
-            if (data.success) {
+            if (data.status=='ok') {
                 html = `<div class="alert alert-success">${data.success}</div>`;
+           
+                Swal.fire(
+                    'Borrado correctamente!',
+                    'Elimiando correctamente',
+                    'success'
+                );
+
                 table.draw();
-                $("#status_crud").html(html);
-                $("#status_crud").addClass("visible").removeClass("invisible");
-                $("#deleteModal").modal("hide");
+            }else{
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error servidor',
+                    html: '',
+                });
             }
         },
+        error: function (request, status, error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Ocurrio un error',
+                html: '',
+            });
+        }
     });
 }

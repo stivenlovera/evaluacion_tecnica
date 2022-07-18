@@ -9,6 +9,11 @@ use Validator;
 
 class AuthController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('guest')->except('logout');
+        $this->middleware('guest', ['only' => 'index']);
+    }
     /**
      * Display a listing of the resource.
      *
@@ -16,7 +21,7 @@ class AuthController extends Controller
      */
     public function index()
     {
-        //
+        return view('panel.auth.login');
     }
 
     /**

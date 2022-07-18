@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Usuario;
 use DataTables;
 use Illuminate\Http\Request;
+use PDF;
 use Validator;
 
 class UsuarioController extends Controller
@@ -24,14 +25,8 @@ class UsuarioController extends Controller
     }
     public function datatable()
     {
-        $data = Usuario::
-            //filtrando por fecha
-            when(!empty(request()->from_date), function ($q) {
-            $from = date('Y-m-d', strtotime(request()->from_date));
-            $to = date('Y-m-d', strtotime(request()->to_date));
-            return $q->whereBetween('informe_proyecto.fecha', [$from, $to]);
-        })
-        //filtrando si hay proyectos
+        $data = Usuario::where('estado', 'activo')
+        //filtrando
             ->when(!empty(request()->orden), function ($query) {
                 switch (request()->orden) {
                     case 'ci':
@@ -50,10 +45,7 @@ class UsuarioController extends Controller
                         # code...
                         break;
                 }
-                /* return $q->where('proyectos.Nombre', 'like', '%' . request()->proyecto . '%'); */
             })
-        //filtrando por codigo visit report
-        //->orderBy('informe_proyecto.fecha', 'DESC')
             ->get();
         return Datatables::of($data)
             ->addIndexColumn()
@@ -235,7 +227,9 @@ class UsuarioController extends Controller
      */
     public function destroy($id)
     {
-        $data = Usuario::where('id', $id)->delete();
+        $data = Usuario::where('id', $id)->update([
+            'estado' => 'inactivo',
+        ]);
         if ($data) {
             return response()->json([
                 'status' => 'ok',
@@ -247,5 +241,11 @@ class UsuarioController extends Controller
                 'message' => 'Ocurrio un error',
             ], 200);
         }
+    }
+    public function report(Request $request)
+    {
+        $usuarios = Usuario::where('estado', 'activo')->get();
+        $pdf = PDF::loadView('panel.usuario.report_pdf', compact('usuarios'))->setPaper('letter')->setWarnings(false);
+        return $pdf->stream("lista usuarios.pdf");
     }
 }

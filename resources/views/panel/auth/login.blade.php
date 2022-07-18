@@ -51,7 +51,7 @@
 
                         <div class="separator">
                             <p class="change_link">Eres nuevo en este sitio?
-                                <a href="#signup" class="to_register"> CREAR CUENTA! </a>
+                                {{-- <a href="#signup" class="to_register"> CREAR CUENTA! </a> --}}
                             </p>
 
                             <div class="clearfix"></div>
@@ -80,7 +80,7 @@
                                 required="" />
                         </div>
                         <div>
-                            <button class="btn btn-success" type="Submit">Registrar</button>
+                            <button class="btn btn-success" id="" type="button">Registrar</button>
                         </div>
 
                         <div class="clearfix"></div>
@@ -100,5 +100,4 @@
         </div>
     </div>
 </body>
-
 </html>
