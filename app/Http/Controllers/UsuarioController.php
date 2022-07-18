@@ -9,6 +9,10 @@ use Validator;
 
 class UsuarioController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
     /**
      * Display a listing of the resource.
      *
@@ -20,7 +24,6 @@ class UsuarioController extends Controller
     }
     public function datatable()
     {
-
         $data = Usuario::
             //filtrando por fecha
             when(!empty(request()->from_date), function ($q) {
@@ -29,19 +32,34 @@ class UsuarioController extends Controller
             return $q->whereBetween('informe_proyecto.fecha', [$from, $to]);
         })
         //filtrando si hay proyectos
-        /*  ->when(!empty(request()->proyecto), function ($q) {
-        //dd('proyecto');
-        return $q->where('proyectos.Nombre', 'like', '%' . request()->proyecto . '%');
-        }) */
+            ->when(!empty(request()->orden), function ($query) {
+                switch (request()->orden) {
+                    case 'ci':
+                        return $query->orderBy('ci', 'ASC');
+                        break;
+                    case 'nombre':
+                        return $query->orderBy('nombre', 'ASC');
+                        break;
+                    case 'apellido':
+                        return $query->orderBy('apellido', 'ASC');
+                        break;
+                    case 'nacionalidad':
+                        return $query->orderBy('nacionalidad', 'ASC');
+                        break;
+                    default:
+                        # code...
+                        break;
+                }
+                /* return $q->where('proyectos.Nombre', 'like', '%' . request()->proyecto . '%'); */
+            })
         //filtrando por codigo visit report
         //->orderBy('informe_proyecto.fecha', 'DESC')
             ->get();
         return Datatables::of($data)
             ->addIndexColumn()
             ->addColumn('acciones', function ($data) {
-                $button = "
-                    <button type='button' class='btn btn-secondary btn-sm m-0 d-inline '>Editar</button>
-                    <button type='button' class='btn btn-danger btn-sm m-0 d-inline '>Eliminar</button>
+                $button = "  <button type='button' class='btn btn-secondary btn-sm m-0 d-inline edit' data-id='$data->id'>Editar</button>
+                    <button type='button' class='btn btn-danger btn-sm m-0 d-inline delete' data-id='$data->id'>Eliminar</button>
                 ";
                 return $button;
             })
@@ -67,16 +85,52 @@ class UsuarioController extends Controller
     public function store(Request $request)
     {
         $rules = array(
-            'Informe_ID' => 'required',
-            'Pro_ID' => 'required',
-            'Empleado_ID' => 'nullable',
-            'Fecha' => 'nullable',
-            'Drywall_comments' => 'nullable',
+            'ci' => 'required|numeric',
+            'nombre' => 'required',
+            'apellido' => 'required',
+            'nacionalidad' => 'required',
+            'edad' => 'required|numeric',
+            'email' => 'required',
+            'celular' => 'nullable',
+            'dirrecion' => 'nullable',
         );
-
-        $error = Validator::make($request->all(), $rules);
-        if (request()->ajax() === true) {
-            return response()->json(['errors' => $error->errors()->all()]);
+        $messages = [
+            'ci.required' => "CI es requerido",
+            'ci.numeric' => "CI deben ser numeros",
+            'nombre.required' => "Nombre es requerido",
+            'apellido.required' => "Apellido  es requerido",
+            'nacionalidad.required' => "Nacionalidad es requerido",
+            'edad.required' => "Edad es requerido",
+            'edad.numeric' => "Edad debe ser un numero",
+            'email.required' => "Email es requerido",
+        ];
+        $error = Validator::make($request->all(), $rules, $messages);
+        if (count($error->errors()->all()) > 0) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $error->errors()->all(),
+            ]);
+        }
+        $data = Usuario::insert([
+            'ci' => $request->ci,
+            'nombre' => $request->nombre,
+            'apellido' => $request->apellido,
+            'nacionalidad' => $request->nacionalidad,
+            'edad' => $request->edad,
+            'email' => $request->email,
+            'celular' => $request->celular == null ? '' : $request->celular,
+            'dirrecion' => $request->dirrecion == null ? '' : $request->dirrecion,
+        ]);
+        if ($data) {
+            return response()->json([
+                'status' => 'ok',
+                'message' => 'Resgistrado correctamente',
+            ], 200);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Ocurrio un error',
+            ], 200);
         }
     }
 
@@ -99,7 +153,19 @@ class UsuarioController extends Controller
      */
     public function edit($id)
     {
-        //
+        $data = Usuario::where('id', $id)->first();
+        if ($data) {
+            return response()->json([
+                'status' => 'ok',
+                'data' => $data,
+                'message' => 'Resgistrado correctamente',
+            ], 200);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Ocurrio un error',
+            ], 200);
+        }
     }
 
     /**
@@ -111,7 +177,54 @@ class UsuarioController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $rules = array(
+            'ci' => 'required|numeric',
+            'nombre' => 'required',
+            'apellido' => 'required',
+            'nacionalidad' => 'required',
+            'edad' => 'required|numeric',
+            'email' => 'required',
+            'celular' => 'nullable',
+            'dirrecion' => 'nullable',
+        );
+        $messages = [
+            'ci.required' => "CI es requerido",
+            'ci.numeric' => "CI deben ser numeros",
+            'nombre.required' => "Nombre es requerido",
+            'apellido.required' => "Apellido  es requerido",
+            'nacionalidad.required' => "Nacionalidad es requerido",
+            'edad.required' => "Edad es requerido",
+            'edad.numeric' => "Edad debe ser un numero",
+            'email.required' => "Email es requerido",
+        ];
+        $error = Validator::make($request->all(), $rules, $messages);
+        if (count($error->errors()->all()) > 0) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $error->errors()->all(),
+            ]);
+        }
+        $data = Usuario::where('id', $request->usuario_id)->update([
+            'ci' => $request->ci,
+            'nombre' => $request->nombre,
+            'apellido' => $request->apellido,
+            'nacionalidad' => $request->nacionalidad,
+            'edad' => $request->edad,
+            'email' => $request->email,
+            'celular' => $request->celular == null ? '' : $request->celular,
+            'dirrecion' => $request->dirrecion == null ? '' : $request->dirrecion,
+        ]);
+        if ($data) {
+            return response()->json([
+                'status' => 'ok',
+                'message' => 'Modificado  correctamente',
+            ], 200);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Ocurrio un error',
+            ], 200);
+        }
     }
 
     /**
@@ -122,6 +235,17 @@ class UsuarioController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $data = Usuario::where('id', $id)->delete();
+        if ($data) {
+            return response()->json([
+                'status' => 'ok',
+                'message' => 'Eliminado correctamente',
+            ], 200);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Ocurrio un error',
+            ], 200);
+        }
     }
 }

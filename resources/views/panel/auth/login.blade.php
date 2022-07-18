@@ -31,7 +31,9 @@
         <div class="login_wrapper">
             <div class="animate form login_form">
                 <section class="login_content">
-                    <form method="POST" action="{{ route('usuarios.list') }}">
+                    <form method="POST" action="{{ route('auth') }}">
+                        @csrf
+                        @method('POST')
                         <h1>Iniciar</h1>
                         <div>
                             <input type="text" name="usuario" c class="form-control" placeholder="Usuario"
@@ -85,7 +87,7 @@
 
                         <div class="separator">
                             <p class="change_link">Y esta registrado ?
-                                <a href="{{ route('usuarios.list') }}" class="to_register"> INICIA AQUI </a>
+                                <a href="" class="to_register"> INICIA AQUI </a>
                             </p>
 
                             <div class="clearfix"></div>

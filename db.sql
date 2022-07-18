@@ -20,5 +20,15 @@ CREATE TABLE
         celular VARCHAR(350) NOT NULL,
         dirrecion VARCHAR(350) NOT NULL,
         estado VARCHAR(350) DEFAULT 'activo',
-        creado_por int NULL 
+        creado_por int NULL
+    );
+
+DROP TABLE IF EXISTS auth;
+
+CREATE TABLE
+    auth(
+        id int AUTO_INCREMENT primary key,
+        username VARCHAR(350) NOT NULL,
+        email VARCHAR(350) NOT NULL,
+        password TEXT NOT NULL,
     );

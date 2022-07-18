@@ -37,20 +37,21 @@
                                     <div class="form-group row">
                                         <label class="control-label col-md-4 col-sm-4 mt-2">Ordenar</label>
                                         <div class="col-md-8 col-sm-8">
-                                            <select class="form-control">
-                                                <option>Seleccione orden</option>
-                                                <option>Option one</option>
-                                                <option>Option two</option>
-                                                <option>Option three</option>
-                                                <option>Option four</option>
+                                            <select class="form-control" id="ordenar">
+                                                <option value="ci">ci</option>
+                                                <option value="nombre">nombre</option>
+                                                <option value="apellido">apellido</option>
+                                                <option value="nacionalidad">nacionalidad</option>
+                                                
                                             </select>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6 d-flex flex-row-reverse">
                                     <div class="form-group row">
-                                        <button type="button"
-                                            class="btn btn-secondary btn-sm m-0 d-inline ">Añadir</button>
+                                        <button type="button" id="new"
+                                            class="btn btn-secondary btn-sm m-0 d-inline ">Crear usuario
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -71,7 +72,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        
+
                                     </tbody>
                                 </table>
                             </div>
@@ -81,14 +82,17 @@
             </div>
         </div>
     </div>
+    <x-.usuario.modal />
 @endsection
 @push('java-script')
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
         var table = $('#table').DataTable({
             processing: true,
             serverSide: true,
             responsive: true,
-            ajax: `${base_url}/usuario/data-table`,//
+            ajax: `${base_url}/usuario/data-table?orden=${$('#ordenar').val()}`, //
             order: [],
             columns: [{
                     data: "ci",
@@ -132,4 +136,8 @@
             }
         });
     </script>
+     <script src="{{ asset('js/usuario/list.js') }}"></script>
+    <script src="{{ asset('js/usuario/update.js') }}"></script>
+    <script src="{{ asset('js/usuario/store.js') }}"></script>
+    <script src="{{ asset('js/usuario/delete.js') }}"></script>
 @endpush
