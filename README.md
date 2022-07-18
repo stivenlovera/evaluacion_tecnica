@@ -7,6 +7,15 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+## Notas 
+- no se usaron migraciones para arrancar la base de datos, ejecutar script 'db.sql' que se encuentra en la ruta principal del proyecto
+
+### Acceso
+Usuario: admin
+Contraseña: admin
+
+encuentre una demo una aqui [documentation](https://laravel.com/docs)
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
